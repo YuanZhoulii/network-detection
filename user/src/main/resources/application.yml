@@ -1,0 +1,82 @@
+spring:
+  # 数据源
+  datasource:
+    username: root
+    password: 97588016
+    url: jdbc:mysql://localhost:3306/network-detection-user?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  # nacos注册中心
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+    alibaba:
+      seata:
+        tx-service-group: user
+    sentinel:
+      transport:
+        port: 8719
+        dashboard: localhost:8333
+  # 应用名称
+  application:
+    name: user
+  # 注册中心配置无效，只能在本地配置
+  main:
+    banner-mode: off
+  thymeleaf:
+    cache: false
+  redis:
+    host: 127.0.0.1
+    port: 6379
+  session:
+    store-type: redis
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+  mvc:
+    format:
+      date-time: yyyy-MM-dd HH:mm:ss
+
+# 应用服务 WEB 访问端口
+server:
+  port: 7000
+  servlet:
+    session:
+      timeout: 30m
+# 配置mapper位置
+mybatis-plus:
+  mapper-locations: classpath:/mapper/**/*.xml
+  # 配置自增主键
+  global-config:
+    db-config:
+      id-type: auto
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    #开启驼峰下划线转换
+    map-underscore-to-camel-case: true
+
+## ERROR>WARN>INFO>DEBUG
+# 只显示INFO以上级别日志，在注册中心上配置无效，只能在本地配置
+logging:
+  level:
+    org:
+      springframework: debug
+    root: OFF
+debug: true
+seata:
+  service:
+    vgroup-mapping:
+      user: default
+    grouplist:
+      default: 127.0.0.1:8091
+feign:
+  sentinel:
+    enabled: true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
+
+

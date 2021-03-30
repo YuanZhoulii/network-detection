@@ -1,0 +1,31 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: auth_server_route
+          uri: lb://auth-server
+          predicates:
+            - Path=/api/auth/**
+          filters:
+            #网关端口是88，auth-server服务端口是20000
+            #http://localhost:88/api/auth/regist改写成
+            #http://localhost:10000/auth/regist
+            - RewritePath=/api/(?<segment>.*), /$\{segment}
+
+        - id: visual_route
+          uri: lb://visual
+          predicates:
+            - Path=/api/visual/**
+          filters:
+            - RewritePath=/api/(?<segment>.*), /$\{segment}
+
+        - id: admin_route
+          # 负载均衡的调用renren-fast服务
+          uri: lb://renren-fast
+          predicates:
+            - Path=/api/**
+          filters:
+            #http://localhost:88/api/captcha.jpg改写成
+            #http://localhost:8080/renren-fast/captcha.jpg
+            - RewritePath=/api/(?<segment>.*), /renren-fast/$\{segment}
+

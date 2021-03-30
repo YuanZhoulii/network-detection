@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.blaze.network.save.dao.NmapTaskDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.blaze.network.save.entity.NmapTaskEntity" id="nmapTaskMap">
+        <result property="nmapTaskId" column="nmap_task_id"/>
+        <result property="args" column="args"/>
+        <result property="scanType" column="scan_type"/>
+        <result property="protocol" column="protocol"/>
+        <result property="elapsed" column="elapsed"/>
+        <result property="finishTime" column="finish_time"/>
+        <result property="summary" column="summary"/>
+        <result property="runStatus" column="run_status"/>
+        <result property="hostsUp" column="hosts_up"/>
+        <result property="hostsDown" column="hosts_down"/>
+    </resultMap>
+
+
+</mapper>

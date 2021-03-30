@@ -10,6 +10,13 @@
     <packaging>pom</packaging>
     <modules>
         <module>user</module>
+        <module>admin</module>
+        <module>renren-generator</module>
+        <module>common</module>
+        <module>gateway</module>
+        <module>auth-server</module>
+        <module>save</module>
+        <module>visual</module>
     </modules>
 
 
