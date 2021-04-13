@@ -1,4 +1,4 @@
-package com.blaze.network.user.util;
+package com.blaze.network.user.common.util;
 
 import java.util.Random;
 

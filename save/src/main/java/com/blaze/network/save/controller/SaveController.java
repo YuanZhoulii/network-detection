@@ -29,7 +29,7 @@ public class SaveController {
     @RequestMapping("/os")
     public R os(String filePath){
         System.out.println("filepath："+filePath);
-//        saveService.saveAllStatus(filePath);
+        saveService.saveAllStatus(filePath);
         return R.ok();
     }
     @RequestMapping("/all")

@@ -8,11 +8,9 @@ spring:
             - Path=/api/auth/**
           filters:
             - RewritePath=/api/(?<segment>.*), /$\{segment}
-
               #网关端口是88，auth-server服务端口是20000
             #http://localhost:88/api/auth/regist改写成
             #http://localhost:10000/auth/regist
-
         - id: search_route
           uri: lb://search
           predicates:

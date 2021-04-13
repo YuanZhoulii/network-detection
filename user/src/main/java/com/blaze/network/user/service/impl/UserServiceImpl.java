@@ -14,7 +14,7 @@ import com.blaze.network.user.dao.UserDao;
 import com.blaze.network.user.entity.UserEntity;
 import com.blaze.network.user.common.exception.*;
 import com.blaze.network.user.service.UserService;
-import com.blaze.network.user.util.NickName;
+import com.blaze.network.user.common.util.NickName;
 import com.blaze.network.user.vo.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
