@@ -19,7 +19,7 @@ spring:
             - RewritePath=/api/(?<segment>.*), /$\{segment}
         - id: admin_route
           # 负载均衡的调用renren-fast服务
-          uri: lb://renren-fast
+          uri: lb://admin
           predicates:
             - Path=/api/**
           filters:
