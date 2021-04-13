@@ -27,6 +27,7 @@ public class DateUtils {
 	public final static String DATE_PATTERN = "yyyy-MM-dd";
 	/** 时间格式(yyyy-MM-dd HH:mm:ss) */
 	public final static String DATE_TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
+	public final static String CH_DATE_TIME_PATTERN = "HH时mm分ss秒";
 
     /**
      * 日期格式化 日期格式为：yyyy-MM-dd
@@ -34,7 +35,7 @@ public class DateUtils {
      * @return  返回yyyy-MM-dd格式日期
      */
 	public static String format(Date date) {
-        return format(date, DATE_PATTERN);
+        return format(date, CH_DATE_TIME_PATTERN);
     }
 
     /**

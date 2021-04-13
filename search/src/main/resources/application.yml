@@ -1,0 +1,35 @@
+spring:
+  datasource:
+    username: root
+    password: 97588016
+    url: jdbc:mysql://localhost:3306/network-detection-save?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+  mvc:
+    format:
+      date-time: yyyy-MM-dd HH:mm:ss
+
+# 配置mapper位置
+mybatis-plus:
+  mapper-locations: classpath:/mapper/**/*.xml
+  # 配置自增主键
+  global-config:
+    db-config:
+      id-type: auto
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    #开启驼峰下划线转换
+    map-underscore-to-camel-case: true
+
+logging:
+  level:
+    org:
+      springframework: debug
+    root: OFF

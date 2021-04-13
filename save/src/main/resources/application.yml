@@ -31,5 +31,5 @@ mybatis-plus:
 logging:
   level:
     org:
-      springframework: debug
-    root: OFF
+      springframework: error
+    root: error

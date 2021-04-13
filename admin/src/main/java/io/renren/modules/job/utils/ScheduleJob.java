@@ -8,6 +8,7 @@
 
 package io.renren.modules.job.utils;
 
+import com.alibaba.fastjson.JSON;
 import io.renren.common.utils.SpringContextUtils;
 import io.renren.modules.job.entity.ScheduleJobEntity;
 import io.renren.modules.job.entity.ScheduleJobLogEntity;
@@ -17,10 +18,13 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import java.lang.reflect.Method;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -35,15 +39,13 @@ public class ScheduleJob extends QuartzJobBean {
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
         ScheduleJobEntity scheduleJob = (ScheduleJobEntity) context.getMergedJobDataMap()
         		.get(ScheduleJobEntity.JOB_PARAM_KEY);
-        
+
         //获取spring bean
         ScheduleJobLogService scheduleJobLogService = (ScheduleJobLogService) SpringContextUtils.getBean("scheduleJobLogService");
         
         //数据库保存执行记录
         ScheduleJobLogEntity log = new ScheduleJobLogEntity();
-        log.setJobId(scheduleJob.getJobId());
-        log.setBeanName(scheduleJob.getBeanName());
-        log.setParams(scheduleJob.getParams());
+		BeanUtils.copyProperties(scheduleJob,log);
         log.setCreateTime(new Date());
         
         //任务开始时间
@@ -55,8 +57,15 @@ public class ScheduleJob extends QuartzJobBean {
 
 			Object target = SpringContextUtils.getBean(scheduleJob.getBeanName());
 			Method method = target.getClass().getDeclaredMethod("run", String.class);
-			method.invoke(target, scheduleJob.getParams());
-			
+			Map<String,String> paramsMap=new HashMap<>();
+			paramsMap.put("host",scheduleJob.getScanHost());
+			paramsMap.put("type",scheduleJob.getScanType());
+			String JSONParams = JSON.toJSONString(paramsMap);
+			method.invoke(target, JSONParams);
+
+//			method.invoke(target, scheduleJob.getParams());
+
+
 			//任务执行总时长
 			long times = System.currentTimeMillis() - startTime;
 			log.setTimes((int)times);

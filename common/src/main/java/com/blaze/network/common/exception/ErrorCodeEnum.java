@@ -21,7 +21,12 @@ public enum ErrorCodeEnum {
     USER_EXIST_EXCEPTION(11001,"该账号已被注册"),
     EMAIL_EXIST_EXCEPTION(11002,"该邮箱已被使用"),
     LOGINACCT_PASSWORD_EXCEPTION(11003,"账号或密码错误"),
-    UNLOGIN_EXCEPTION(11004,"您尚未登录");
+    UNLOGIN_EXCEPTION(11004,"您尚未登录"),
+    NICKNAME_EXIST_EXCEPTION(11005,"该昵称已被使用"),
+    MOBILE_EXIST_EXCEPTION(11006,"该手机号已被使用"),
+    WRONG_OLD_PASSWORD_EXCEPTION(11007,"原密码错误"),
+    NEW_EQ_OLD_PASSWORD_EXCEPTION(11008,"新密码与原密码相同"),
+    UPDATE_EXCEPTION(11009,"更新用户信息失败"),
     ;
 
     private int code;

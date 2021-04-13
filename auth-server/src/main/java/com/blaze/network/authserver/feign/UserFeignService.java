@@ -2,7 +2,7 @@ package com.blaze.network.authserver.feign;
 
 import com.blaze.network.authserver.vo.AuthLoginVo;
 import com.blaze.network.authserver.vo.AuthRegistVo;
-import com.blaze.network.authserver.vo.UserVo;
+import com.blaze.network.authserver.vo.AuthUpdateVo;
 import com.blaze.network.common.utils.R;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,10 +16,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @FeignClient("user")
 @RequestMapping("user/user")
 public interface UserFeignService {
+    @RequestMapping("/update")
+    public R update(@RequestBody AuthUpdateVo info);
     @PostMapping("/regist")
     public R regist(@RequestBody AuthRegistVo userRegistVo);
     @PostMapping("/login")
     public R login(@RequestBody AuthLoginVo userLoginVo);
-    @RequestMapping("/update")
-    public R update(@RequestBody UserVo info);
+
 }

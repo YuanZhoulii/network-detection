@@ -11,6 +11,8 @@ public class ResponseConstant {
     public static final String LOGIN_FAIL="登录失败";
     public static final String REGIST_SUCCESS="注册成功";
     public static final String REGIST_FAIL="注册失败";
-    public static final String GET_INFO_SUCCESS="您已登录";
+    public static final String ALREADY_LOGIN ="您已登录";
+    public static final String UPDATE_SUCCESS="更新用户信息成功";
+    public static final String UPDATE_FAIL="更新用户信息失败";
 
 }

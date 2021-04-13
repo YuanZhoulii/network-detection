@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.blaze.network.search.dao.HostDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.blaze.network.search.entity.HostEntity" id="hostMap">
+        <result property="hostId" column="host_id"/>
+        <result property="address" column="address"/>
+        <result property="addressType" column="address_type"/>
+        <result property="statusState" column="status_state"/>
+        <result property="statusReason" column="status_reason"/>
+        <result property="reasonTtl" column="reason_ttl"/>
+        <result property="area" column="area"/>
+<!--        <result property="operatorSystem" column="operatorSystem"/>-->
+    </resultMap>
+
+    <select id="QueryForMapData" resultType="com.blaze.network.search.vo.MapItemVo">
+        SELECT
+            save_province.`name`,
+            count(save_province.`name`) as `value`
+
+        FROM
+            save_province
+                LEFT JOIN
+            save_host
+            ON
+                save_host.area = save_province.`name`
+        GROUP BY
+            save_province.`name`
+    </select>
+    <select id="QueryForBarData" resultType="com.blaze.network.search.vo.bar.BarItemVo">
+        SELECT
+            save_province.`name`,
+            count(save_province.`name`) as `value`
+        FROM
+            save_province
+                LEFT JOIN
+            save_host
+            ON
+                save_host.area = save_province.`name`
+        GROUP BY
+            save_province.`name`
+        ORDER BY
+            COUNT( save_province.`name` ) DESC
+        LIMIT 10;
+    </select>
+    <select id="QueryForOSData" resultType="com.blaze.network.search.vo.pie.PieDataItemVo">
+        SELECT
+            os `name`,
+            COUNT( os ) AS `value`
+        FROM
+            save_host
+        WHERE
+            os IS NOT NULL
+          AND os != ""
+        GROUP BY
+            ( os )
+        ORDER BY
+            COUNT( os ) DESC
+        LIMIT 8;
+    </select>
+
+
+</mapper>

@@ -4,7 +4,6 @@ import com.blaze.network.common.utils.PageUtils;
 import com.blaze.network.common.utils.R;
 import com.blaze.network.save.entity.NmapTaskEntity;
 import com.blaze.network.save.service.NmapTaskService;
-import com.blaze.network.save.utils.MySAXParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,7 +28,7 @@ public class NmapTaskController {
 
     @RequestMapping("/mysave")
     public void mysave(){
-        MySAXParser.parse("nmap_output.xml");
+//        MySAXParser.parse("nmap_output.xml");
     }
 
     /**

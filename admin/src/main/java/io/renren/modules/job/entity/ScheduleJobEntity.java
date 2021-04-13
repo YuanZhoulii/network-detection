@@ -12,6 +12,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import lombok.ToString;
 
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
@@ -22,6 +23,7 @@ import java.util.Date;
  *
  * @author Mark sunlightcs@gmail.com
  */
+@ToString
 @Data
 @TableName("schedule_job")
 public class ScheduleJobEntity implements Serializable {
@@ -43,7 +45,15 @@ public class ScheduleJobEntity implements Serializable {
 	 */
 	@NotBlank(message="bean名称不能为空")
 	private String beanName;
-	
+
+	/**
+	 * 扫描主机
+	 */
+	private String scanHost;
+	/**
+	 * 扫描类型
+	 */
+	private String scanType;
 	/**
 	 * 参数
 	 */

@@ -1,10 +1,11 @@
 package com.blaze.network.authserver.controller;
 
 import com.alibaba.fastjson.TypeReference;
+import com.blaze.network.authserver.feign.LoginLogFeignService;
 import com.blaze.network.authserver.feign.UserFeignService;
-import com.blaze.network.authserver.service.AuthService;
 import com.blaze.network.authserver.vo.AuthLoginVo;
 import com.blaze.network.authserver.vo.AuthRegistVo;
+import com.blaze.network.authserver.vo.AuthUpdateVo;
 import com.blaze.network.common.constant.LogConstant;
 import com.blaze.network.common.constant.ResponseConstant;
 import com.blaze.network.common.constant.SessionConstant;
@@ -17,6 +18,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.Map;
@@ -33,13 +35,31 @@ public class AuthController {
     @Autowired
     UserFeignService userFeignService;
     @Autowired
-    AuthService authService;
+    LoginLogFeignService loginLogFeignService;
+    @RequestMapping("/update")
+    public R update(@RequestBody @Valid AuthUpdateVo vo,BindingResult result,HttpSession session){
+        log.info(vo.getClass().getName()+":"+ vo);
+        if(result.hasErrors()){
+            log.error(LogConstant.UPDATE_FAIL);
+            Map<String, String> errors = result.getFieldErrors().stream().collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
+            return R.error(ErrorCodeEnum.VAILD_EXCEPTION.getCode(), ErrorCodeEnum.VAILD_EXCEPTION.getMsg()).put("errors",errors);
+        }
+        //调用远程服务进行更新
+        R r = userFeignService.update(vo);
+        if (r.getCode() == 0) {
+            //更新成功
+            UserResponseVo data = r.getData("data", new TypeReference<UserResponseVo>() {
+            });
+            //将当前用户信息放在session中
+            session.setAttribute(SessionConstant.LOGIN_USER,data);
+            log.info(LogConstant.UPDATE_SUCCESS);
+        } else {
+            log.error(LogConstant.UPDATE_FAIL);
+        }
 
-    @GetMapping("/seata")
-    public void seataTest(){
-        authService.testSeata();
-
+        return r;
     }
+
     /**
      * @Description 获取登录用户信息
      * @date 2021-02-20
@@ -53,7 +73,7 @@ public class AuthController {
         if(user==null){
             return R.error(ErrorCodeEnum.UNLOGIN_EXCEPTION.getCode(), ErrorCodeEnum.UNLOGIN_EXCEPTION.getMsg());
         }
-        return R.ok(ResponseConstant.GET_INFO_SUCCESS).setData(user);
+        return R.ok(ResponseConstant.ALREADY_LOGIN).setData(user);
     }
 
     @GetMapping("/exit")
@@ -73,7 +93,7 @@ public class AuthController {
         log.info("authRegistVo:"+ authRegistVo);
         //参数校验出错
         if(result.hasErrors()){
-            log.error(LogConstant.LOGIN_FAIL);
+            log.error(LogConstant.REGIST_FAIL);
             //将错误消息封装为map
             Map<String, String> errors = result.getFieldErrors().stream().collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
             return R.error(ErrorCodeEnum.VAILD_EXCEPTION.getCode(), ErrorCodeEnum.VAILD_EXCEPTION.getMsg()).put("errors",errors);
@@ -83,16 +103,16 @@ public class AuthController {
 
 
         if (r.getCode() == 0) {
-            log.info(LogConstant.LOGIN_SUCCESS);
+            log.info(LogConstant.REGIST_SUCCESS);
         } else {
-            log.error(LogConstant.LOGIN_FAIL);
+            log.error(LogConstant.REGIST_FAIL);
         }
 
         return r;
     }
 
     @PostMapping("/login")
-    public R login(@RequestBody @Valid AuthLoginVo authLoginVo, BindingResult result, HttpSession session){
+    public R login(@RequestBody @Valid AuthLoginVo authLoginVo, BindingResult result, HttpSession session, HttpServletRequest request){
         //参数校验出错
         if(result.hasErrors()){
             log.error(LogConstant.LOGIN_FAIL);
@@ -116,4 +136,5 @@ public class AuthController {
         }
         return r;
     }
+
 }

@@ -16,5 +16,7 @@ import java.util.Map;
 public interface LoginLogService extends IService<LoginLogEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    void saveLoginLog(Integer userId, String realIp);
 }
 

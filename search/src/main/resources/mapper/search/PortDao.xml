@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.blaze.network.search.dao.PortDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.blaze.network.search.entity.PortEntity" id="portMap">
+        <result property="portId" column="port_id"/>
+        <result property="protocol" column="protocol"/>
+        <result property="num" column="num"/>
+        <result property="state" column="state"/>
+        <result property="stateReason" column="state_reason"/>
+        <result property="stateReasonTtl" column="state_reason_ttl"/>
+        <result property="serviceName" column="service_name"/>
+<!--        <result property="serviceVersion" column="service_version"/>-->
+        <result property="hostId" column="host_id"/>
+    </resultMap>
+    <select id="queryForServiceData" resultType="com.blaze.network.search.vo.pie.PieDataItemVo">
+        SELECT
+            `service_name` `name`,
+            COUNT( `service_name` ) `value`
+        FROM
+            save_port
+        WHERE
+            `service_name` IS NOT NULL
+          AND `service_name` != ""
+        GROUP BY
+            ( `service_name` )
+        ORDER BY
+            COUNT( `service_name` ) DESC
+        LIMIT 8;
+    </select>
+    <select id="queryForPortData" resultType="com.blaze.network.search.vo.pie.PieDataItemVo">
+        SELECT
+            `num` `name`,
+            COUNT( `num` ) AS `value`
+        FROM
+            save_port
+        WHERE
+            `num` IS NOT NULL
+          AND `num` != ""
+        GROUP BY
+            ( `num` )
+        ORDER BY
+            COUNT( `num` ) DESC
+        LIMIT 8;
+    </select>
+
+
+</mapper>

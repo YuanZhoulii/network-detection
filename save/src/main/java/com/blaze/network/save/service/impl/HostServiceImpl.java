@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.blaze.network.common.utils.PageUtils;
 import com.blaze.network.common.utils.Query;
-import com.blaze.network.save.common.RequestConstant;
+import com.blaze.network.save.common.constant.RequestConstant;
 import com.blaze.network.save.dao.HostDao;
 import com.blaze.network.save.entity.HostEntity;
 import com.blaze.network.save.service.HostService;

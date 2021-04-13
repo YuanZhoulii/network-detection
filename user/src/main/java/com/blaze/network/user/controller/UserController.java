@@ -3,21 +3,20 @@ package com.blaze.network.user.controller;
 
 import com.blaze.network.common.constant.ResponseConstant;
 import com.blaze.network.common.exception.ErrorCodeEnum;
+import com.blaze.network.common.exception.ErrorMsg;
 import com.blaze.network.common.utils.PageUtils;
 import com.blaze.network.common.utils.R;
 import com.blaze.network.user.entity.UserEntity;
-import com.blaze.network.user.exception.EmailExistException;
-import com.blaze.network.user.exception.UserNameExistException;
+import com.blaze.network.user.common.exception.*;
 import com.blaze.network.user.feign.GatewayFeignService;
+import com.blaze.network.user.service.LoginLogService;
 import com.blaze.network.user.service.UserService;
-import com.blaze.network.user.vo.UserLoginRespVo;
-import com.blaze.network.user.vo.UserLoginVo;
-import com.blaze.network.user.vo.UserRegistVo;
-import com.blaze.network.user.vo.UserSaveVo;
+import com.blaze.network.user.vo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -34,6 +33,8 @@ import java.util.Map;
 public class UserController {
     @Autowired
     private UserService userService;
+    @Autowired
+    private LoginLogService loginLogService;
     @Autowired
     GatewayFeignService gatewayFeignService;
 
@@ -59,9 +60,10 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public R login(@RequestBody UserLoginVo userLoginVo) {
+    public R login(@RequestBody UserLoginVo userLoginVo,HttpServletRequest request) {
         UserLoginRespVo info = userService.login(userLoginVo);
         if(info!=null){
+            loginLogService.saveLoginLog(info.getUserId(),getRealIp(request));
             return R.ok(ResponseConstant.LOGIN_SUCCESS).setData(info);
         }else{
             return R.error(ErrorCodeEnum.LOGINACCT_PASSWORD_EXCEPTION.getCode(), ErrorCodeEnum.LOGINACCT_PASSWORD_EXCEPTION.getMsg());
@@ -78,7 +80,28 @@ public class UserController {
         return R.ok().put("page", page);
     }
 
-
+    public static String getRealIp(HttpServletRequest request) {
+        // 这个一般是Nginx反向代理设置的参数
+        String ip = request.getHeader("X-Real-IP");
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("X-Forwarded-For");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        }
+        // 处理多IP的情况（只取第一个IP）
+        if (ip != null && ip.contains(",")) {
+            String[] ipArray = ip.split(",");
+            ip = ipArray[0];
+        }
+        return ip;
+    }
     /**
      * 信息
      */
@@ -104,11 +127,33 @@ public class UserController {
      */
 //    @Transactional
     @RequestMapping("/update")
-    public R update(@RequestBody UserEntity info) {
+    public R update(@RequestBody UserUpdateVo info) {
+        UserLoginRespVo resp=null;
+        ErrorMsg errorMsg=new ErrorMsg();
+        try{
+             resp= userService.myUpdateById(info);
+        } catch (EmailExistException e) {
+            errorMsg.setEmail(ErrorCodeEnum.EMAIL_EXIST_EXCEPTION.getMsg());
+//            return R.error(ErrorCodeEnum.UPDATE_EXCEPTION.getCode(), ErrorCodeEnum.UPDATE_EXCEPTION.getMsg()).put("errors",errorMsg);
+        }catch (MobileExistException e) {
+            errorMsg.setMobile(ErrorCodeEnum.MOBILE_EXIST_EXCEPTION.getMsg());
+//            return R.error(ErrorCodeEnum.UPDATE_EXCEPTION.getCode(), ErrorCodeEnum.UPDATE_EXCEPTION.getMsg()).put("errors",errorMsg);
+        }catch (NicknameExistException e) {
+            errorMsg.setNickname(ErrorCodeEnum.NICKNAME_EXIST_EXCEPTION.getMsg());
+//            return R.error(ErrorCodeEnum.UPDATE_EXCEPTION.getCode(), ErrorCodeEnum.UPDATE_EXCEPTION.getMsg()).put("errors",errorMsg);
+        }catch (WrongOldPasswordException e){
+            errorMsg.setOldPassword(ErrorCodeEnum.WRONG_OLD_PASSWORD_EXCEPTION.getMsg());
+//            return R.error(ErrorCodeEnum.UPDATE_EXCEPTION.getCode(), ErrorCodeEnum.UPDATE_EXCEPTION.getMsg()).put("errors",errorMsg);
+        }catch (NewPasswordEqualsOldPasswordException e){
+            errorMsg.setNewPassword(ErrorCodeEnum.NEW_EQ_OLD_PASSWORD_EXCEPTION.getMsg());
+//            return R.error(ErrorCodeEnum.UPDATE_EXCEPTION.getCode(), ErrorCodeEnum.UPDATE_EXCEPTION.getMsg()).put("errors",errorMsg);
+        }
 
-        userService.updateById(info);
+        if(resp==null){
+            return R.error(ErrorCodeEnum.UPDATE_EXCEPTION.getCode(), ErrorCodeEnum.UPDATE_EXCEPTION.getMsg()).put("errors",errorMsg);
+        }
+        return R.ok(ResponseConstant.UPDATE_SUCCESS).setData(resp);
 
-        return R.ok();
     }
 
     /**

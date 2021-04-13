@@ -60,6 +60,7 @@ public class ScheduleJobController {
 	@RequestMapping("/save")
 	@RequiresPermissions("sys:schedule:save")
 	public R save(@RequestBody ScheduleJobEntity scheduleJob){
+		System.out.println("scheduleJob = " + scheduleJob);
 		ValidatorUtils.validateEntity(scheduleJob);
 		
 		scheduleJobService.saveJob(scheduleJob);

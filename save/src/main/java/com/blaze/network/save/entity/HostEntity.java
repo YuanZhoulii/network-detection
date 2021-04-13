@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 
@@ -51,5 +52,12 @@ public class HostEntity implements Serializable {
 	 * 操作系统
 	 */
 	private String os;
-
+	/**
+	 * nmap任务id
+	 */
+	private Integer nmapTaskId;
+	/**
+	 * 创建时间
+	 */
+	private Date createTime;
 }

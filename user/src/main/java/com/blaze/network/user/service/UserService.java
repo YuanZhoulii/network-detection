@@ -3,12 +3,9 @@ package com.blaze.network.user.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.blaze.network.common.utils.PageUtils;
 import com.blaze.network.user.entity.UserEntity;
-import com.blaze.network.user.exception.EmailExistException;
-import com.blaze.network.user.exception.UserNameExistException;
-import com.blaze.network.user.vo.UserLoginRespVo;
-import com.blaze.network.user.vo.UserLoginVo;
-import com.blaze.network.user.vo.UserRegistVo;
-import com.blaze.network.user.vo.UserSaveVo;
+import com.blaze.network.user.common.exception.EmailExistException;
+import com.blaze.network.user.common.exception.UserNameExistException;
+import com.blaze.network.user.vo.*;
 
 import java.util.Map;
 
@@ -30,5 +27,6 @@ public interface UserService extends IService<UserEntity> {
     UserLoginRespVo login(UserLoginVo userLoginVo);
 
     void save(UserSaveVo info);
+    UserLoginRespVo myUpdateById(UserUpdateVo userUpdateVo);
 }
 

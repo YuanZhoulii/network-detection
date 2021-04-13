@@ -16,7 +16,8 @@
         <module>gateway</module>
         <module>auth-server</module>
         <module>save</module>
-        <module>visual</module>
+        <module>detect</module>
+        <module>search</module>
     </modules>
 
 

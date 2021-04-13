@@ -6,30 +6,33 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.blaze.network.common.utils.PageUtils;
 import com.blaze.network.common.utils.Query;
+import com.blaze.network.common.utils.StringUtils;
 import com.blaze.network.user.common.constant.RequestConstant;
 import com.blaze.network.user.common.constant.SqlConstant;
+import com.blaze.network.user.dao.LoginLogDao;
 import com.blaze.network.user.dao.UserDao;
 import com.blaze.network.user.entity.UserEntity;
-import com.blaze.network.user.exception.EmailExistException;
-import com.blaze.network.user.exception.UserNameExistException;
+import com.blaze.network.user.common.exception.*;
 import com.blaze.network.user.service.UserService;
 import com.blaze.network.user.util.NickName;
-import com.blaze.network.user.vo.UserLoginRespVo;
-import com.blaze.network.user.vo.UserLoginVo;
-import com.blaze.network.user.vo.UserRegistVo;
-import com.blaze.network.user.vo.UserSaveVo;
+import com.blaze.network.user.vo.*;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 
 @Service("infoService")
 public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements UserService {
+    @Autowired
+    UserDao userDao;
+    @Autowired
+    LoginLogDao loginLogDao;
 
     @Transactional
     @Override
@@ -59,11 +62,11 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         /**
          * 2.使用QueryWrapper构造查询条件
          */
-        QueryWrapper<UserEntity> wrapper=new QueryWrapper<>(null,SqlConstant.SELECT_FIELDS);
+        QueryWrapper<UserEntity> wrapper = new QueryWrapper<>(null, SqlConstant.SELECT_FIELDS);
         //参数包含查询条件时根据username模糊查询
         String key = (String) params.get(RequestConstant.KEY);
-        if(!StringUtils.isEmpty(key)){
-            wrapper.like(SqlConstant.USERNAME,key);
+        if (StringUtils.isNotBlank(key)) {
+            wrapper.like(SqlConstant.USERNAME, key);
         }
         IPage<UserEntity> page = this.page(
                 new Query<UserEntity>().getPage(params),
@@ -130,7 +133,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
             boolean matches = bCryptPasswordEncoder.matches(password, passwordDb);
             if (matches) {
                 UserLoginRespVo respVo = new UserLoginRespVo();
-                BeanUtils.copyProperties(userEntity,respVo);
+                BeanUtils.copyProperties(userEntity, respVo);
                 return respVo;
             } else {
                 return null;
@@ -161,4 +164,70 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         baseMapper.insert(userEntity);
     }
 
+    @Override
+    public UserLoginRespVo myUpdateById(UserUpdateVo userUpdateVo) {
+        //查询出用户输入的昵称、邮箱、手机是否已被使用，如果已使用抛异常
+        QueryWrapper<UserEntity> wrapper = new QueryWrapper<>();
+        wrapper.ne("user_id", userUpdateVo.getUserId());
+        wrapper.and((w) -> {
+            w.eq("nickname", userUpdateVo.getNickname())
+                    .or().eq("email", userUpdateVo.getEmail())
+                    .or().eq("mobile", userUpdateVo.getMobile());
+        });
+        List<UserEntity> userEntities = userDao.selectList(wrapper);
+        if (userEntities != null) {
+            for (UserEntity userEntity : userEntities) {
+                if (userEntity.getNickname().equals(userUpdateVo.getNickname())) {
+                    throw new NicknameExistException();
+                }
+                if (userEntity.getEmail().equals(userUpdateVo.getEmail())) {
+                    throw new EmailExistException();
+                }
+                if (userEntity.getMobile().equals(userUpdateVo.getMobile())) {
+                    throw new MobileExistException();
+                }
+
+            }
+        }
+
+        UserEntity userEntity = userDao.selectById(userUpdateVo.getUserId());
+
+        //匹配用户输入的旧密码是否正确
+        String oldPassword = userUpdateVo.getOldPassword();
+        String newPassword = userUpdateVo.getNewPassword();
+        if (StringUtils.isNotBlank(oldPassword)&&StringUtils.isNotBlank(newPassword)) {
+            String oldPasswordDb = userEntity.getPassword();
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+            boolean matches = encoder.matches(oldPassword, oldPasswordDb);
+            //旧密码不正确
+            if (!matches) {
+                throw new WrongOldPasswordException();
+            }
+
+            //新密码与原密码相同
+            if (newPassword.equals(oldPassword)) {
+                throw new NewPasswordEqualsOldPasswordException();
+            }
+            userEntity.setPassword(encoder.encode(newPassword));
+        }
+        if(StringUtils.isNotBlank(userUpdateVo.getEmail())){
+            String entityEmail = userEntity.getEmail();
+            userEntity.setEmail(userUpdateVo.getEmail());
+        }
+        if(StringUtils.isNotBlank(userUpdateVo.getMobile())){
+            userEntity.setMobile(userUpdateVo.getMobile());
+        }
+        if(StringUtils.isNotBlank(userUpdateVo.getNickname())){
+            userEntity.setNickname(userUpdateVo.getNickname());
+        }
+        if(StringUtils.isNotBlank(userUpdateVo.getGender())){
+            userEntity.setGender(userUpdateVo.getGender());
+        }
+
+
+        userDao.updateById(userEntity);
+        UserLoginRespVo loginRespVo = new UserLoginRespVo();
+        BeanUtils.copyProperties(userEntity, loginRespVo);
+        return loginRespVo;
+    }
 }

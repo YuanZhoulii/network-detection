@@ -10,9 +10,9 @@ spring:
     nacos:
       discovery:
         server-addr: 127.0.0.1:8848
-    alibaba:
-      seata:
-        tx-service-group: user
+#    alibaba:
+#      seata:
+#        tx-service-group: user
     sentinel:
       transport:
         port: 8719
@@ -63,12 +63,12 @@ logging:
       springframework: debug
     root: OFF
 debug: true
-seata:
-  service:
-    vgroup-mapping:
-      user: default
-    grouplist:
-      default: 127.0.0.1:8091
+#seata:
+#  service:
+#    vgroup-mapping:
+#      user: default
+#    grouplist:
+#      default: 127.0.0.1:8091
 feign:
   sentinel:
     enabled: true

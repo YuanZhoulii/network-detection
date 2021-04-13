@@ -2,10 +2,10 @@ package com.blaze.network.save.entity;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
-import lombok.Data;
 
 /**
  * 
@@ -48,13 +48,18 @@ public class PortEntity implements Serializable {
 	 * 端口服务名
 	 */
 	private String serviceName;
-	/**
-	 * 端口服务版本
-	 */
-	private String serviceVersion;
+
 	/**
 	 * 对应主机id
 	 */
 	private Integer hostId;
+	/**
+	 * 创建时间
+	 */
+	private Date createTime;
+	/**
+	 * 创建时间
+	 */
+	private String hostAddress;
 
 }
