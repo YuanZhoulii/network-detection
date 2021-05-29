@@ -1,7 +1,7 @@
 # network-detection
 
 #### 介绍
-网络资源探测系统的后端功能实现
+网络资源探测系统后端功能实现
 
 #### 相关技术
 Spring Cloud+Spring Boot+SSM+MySQL+Redis
